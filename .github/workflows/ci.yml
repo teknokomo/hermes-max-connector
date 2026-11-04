@@ -1,0 +1,141 @@
+name: CI
+
+on:
+  push:
+    branches: [main]
+  pull_request:
+
+permissions:
+  contents: read
+
+concurrency:
+  group: ci-${{ github.ref }}
+  cancel-in-progress: true
+
+jobs:
+  quality:
+    name: Python ${{ matrix.python-version }} connector checks
+    runs-on: ubuntu-latest
+    strategy:
+      fail-fast: false
+      matrix:
+        python-version: ["3.11", "3.12", "3.13", "3.14"]
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          persist-credentials: false
+      - uses: actions/setup-python@v5
+        with:
+          python-version: ${{ matrix.python-version }}
+      - uses: astral-sh/setup-uv@v6
+        with:
+          version: 0.10.12
+      - name: Install connector and locked QA dependencies
+        run: |
+          uv sync --locked --group dev --python "${{ matrix.python-version }}"
+      - name: Unit and integration tests
+        run: .venv/bin/python -m pytest -q
+      - name: Autoreview helper reliability
+        run: .venv/bin/python .agents/skills/autoreview/scripts/test-autoreview-reliability.py
+      - name: Static checks
+        run: |
+          .venv/bin/python -m compileall -q adapter.py __init__.py conftest.py tests.py tests tools
+          .venv/bin/ruff check adapter.py __init__.py conftest.py tests.py tests tools
+          .venv/bin/bandit -r adapter.py __init__.py -c pyproject.toml
+      - name: Documentation and release hygiene
+        run: |
+          .venv/bin/python tools/check_readme_parity.py
+          .venv/bin/python tools/check_release_hygiene.py --filesystem
+          sha256sum -c MANIFEST.sha256
+      - name: Build and inspect package
+        run: |
+          .venv/bin/python -m build
+          .venv/bin/twine check dist/*
+          .venv/bin/python - <<'PY'
+          import glob
+          import sys
+          import tarfile
+          import zipfile
+
+          wheels = glob.glob("dist/*.whl")
+          sdists = glob.glob("dist/*.tar.gz")
+          if len(wheels) != 1 or len(sdists) != 1:
+              sys.exit(f"unexpected distributions: {wheels + sdists}")
+          with zipfile.ZipFile(wheels[0]) as archive:
+              entries = archive.namelist()
+          expected = {
+              "hermes_max_connector-0.1.0.data/data/share/hermes/plugins/hermes-max-connector/adapter.py",
+              "hermes_max_connector-0.1.0.data/data/share/hermes/plugins/hermes-max-connector/__init__.py",
+              "hermes_max_connector-0.1.0.data/data/share/hermes/plugins/hermes-max-connector/plugin.yaml",
+          }
+          if not expected.issubset(set(entries)):
+              sys.exit(f"wheel is missing plugin files: {sorted(expected - set(entries))}")
+          forbidden = (".local/", ".ontoindex/", ".agents/", ".claude/", "history/")
+          bad = [name for name in entries if any(part in name for part in forbidden)]
+          if bad:
+              sys.exit(f"wheel contains local development data: {bad}")
+          with tarfile.open(sdists[0]) as archive:
+              names = archive.getnames()
+          required_sdist_suffixes = (
+              "/conftest.py",
+              "/MANIFEST.sha256",
+              "/config/example.yaml",
+              "/uv.lock",
+          )
+          missing = [suffix for suffix in required_sdist_suffixes if not any(name.endswith(suffix) for name in names)]
+          if missing:
+              sys.exit(f"sdist is missing required release files: {missing}")
+          bad = [name for name in names if any(part in name for part in forbidden)]
+          if bad:
+              sys.exit(f"sdist contains local development data: {bad}")
+          print(f"wheel entries={len(entries)} sdist entries={len(names)}")
+          PY
+      - name: Minimum aiohttp runtime
+        if: matrix.python-version == '3.11'
+        run: |
+          uv pip install --python .venv/bin/python aiohttp==3.9.0
+          .venv/bin/python -m pytest -q
+
+  hermes-compatibility:
+    name: Cold load on ${{ matrix.hermes-version }}
+    runs-on: ubuntu-latest
+    strategy:
+      fail-fast: false
+      matrix:
+        include:
+          - hermes-version: v0.22.4
+            hermes-ref: 4d04303818b61bf3aa09278af48356315515965b
+          - hermes-version: v0.22.5
+            hermes-ref: bf0203a794a07aac3ff764972ab9087baa4e4f4e
+    env:
+      HERMES_SOURCE_DIR: ${{ github.workspace }}/.local/qa-hermes-upstream
+      PYTHONPATH: ${{ github.workspace }}/.local/qa-hermes-upstream
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          persist-credentials: false
+      - uses: actions/checkout@v4
+        with:
+          persist-credentials: false
+          repository: NousResearch/hermes-agent
+          ref: ${{ matrix.hermes-ref }}
+          path: .local/qa-hermes-upstream
+          fetch-depth: 1
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.14"
+      - uses: astral-sh/setup-uv@v6
+        with:
+          version: 0.10.12
+      - name: Install locked Hermes runtime and connector test dependencies
+        run: |
+          uv sync --project ./.local/qa-hermes-upstream --locked --no-dev --python 3.14
+          uv pip install --python .local/qa-hermes-upstream/.venv/bin/python \
+            pytest pytest-asyncio pyyaml aiohttp
+      - name: Run the full regression suite against the pinned Hermes API
+        run: .local/qa-hermes-upstream/.venv/bin/python -m pytest -q
+      - name: Run Hermes admission validator
+        run: |
+          plugin_dir=$(mktemp -d "$RUNNER_TEMP/hermes-max-connector.XXXXXX")
+          cp adapter.py __init__.py plugin.yaml pyproject.toml "$plugin_dir/"
+          .local/qa-hermes-upstream/.venv/bin/hermes plugins validate "$plugin_dir"

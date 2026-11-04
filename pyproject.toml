@@ -1,0 +1,56 @@
+[build-system]
+requires = ["setuptools>=77"]
+build-backend = "setuptools.build_meta"
+
+[project]
+name = "hermes-max-connector"
+version = "0.1.0"
+description = "MAX messenger platform adapter for Hermes Agent"
+readme = "README.md"
+requires-python = ">=3.11"
+license = "LicenseRef-Omsk-Open-License-Basic-Attribution"
+license-files = ["LICENSE.md", "LICENSE-RU.md"]
+dependencies = ["aiohttp>=3.9,<4"]
+
+[dependency-groups]
+dev = [
+  "bandit>=1.8,<2",
+  "build>=1.2,<2",
+  "PyYAML>=6,<7",
+  "pytest>=8.3,<10",
+  "pytest-asyncio>=0.24,<2",
+  "ruff>=0.14,<0.18",
+  "twine>=6,<7",
+]
+
+[tool.setuptools]
+include-package-data = true
+py-modules = []
+
+[tool.setuptools.data-files]
+"share/hermes/plugins/hermes-max-connector" = ["adapter.py", "__init__.py", "plugin.yaml"]
+
+[tool.pytest.ini_options]
+asyncio_mode = "auto"
+asyncio_default_fixture_loop_scope = "function"
+python_files = ["test_*.py", "*_test.py", "tests.py"]
+testpaths = ["tests", "."]
+pythonpath = ["."]
+
+[tool.ruff]
+line-length = 100
+target-version = "py311"
+exclude = [".agents", ".local"]
+
+[tool.ruff.lint]
+# Keep the public snapshot lint gate focused on syntax errors and undefined names;
+# the server-derived adapter has unrelated modernization/style debt outside 0.1.0.
+select = ["E4", "E7", "E9", "F"]
+ignore = ["E501"]
+
+[tool.bandit]
+exclude_dirs = [".local", "tests"]
+
+[tool.coverage.run]
+branch = true
+source = ["adapter"]

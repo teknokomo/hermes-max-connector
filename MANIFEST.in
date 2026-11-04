@@ -1,0 +1,15 @@
+include README.md README-RU.md SECURITY.md CHANGELOG.md MANIFEST.sha256
+include LICENSE.md LICENSE-RU.md
+include adapter.py __init__.py plugin.yaml
+include config/example.yaml
+include conftest.py tests.py
+include uv.lock
+recursive-include tests *.py
+recursive-include tools *.py
+recursive-include deploy *.md
+prune .local
+prune .ontoindex
+prune .agents
+prune .claude
+prune .github
+global-exclude __pycache__ *.py[cod] .env .env.* *.db *.db-*
