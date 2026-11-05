@@ -1,0 +1,20 @@
+platforms:
+  max:
+    webhook: true
+    webhook_host: 127.0.0.1
+    webhook_port: 8080
+    webhook_path: /max/webhook
+    ca_bundle: <path-to-ca-bundle>
+    groups:
+      enabled: true
+      allowed_chats:
+        - "<max-chat-id>"
+      require_mention: true
+      exclusive_bot_mentions: true
+      observe_unmentioned_group_messages: false
+    allowed_users:
+      - "<max-user-id>"
+    allow_all_users: false
+    persistent_state: true
+    media_roots:
+      - <path-to-approved-media-root>

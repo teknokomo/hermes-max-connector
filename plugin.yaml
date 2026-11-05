@@ -1,0 +1,61 @@
+name: hermes-max-connector
+label: MAX
+kind: platform
+version: 0.1.0
+description: >
+  Hermes Agent platform adapter for MAX messenger. Production inbound delivery
+  uses a configured webhook; opt-in long polling is for development and testing.
+author: Teknokomo
+license: LicenseRef-Omsk-Open-License-Basic-Attribution
+requires_hermes: ">=0.22.4"
+platforms:
+  - linux
+requires_env:
+  - name: MAX_BOT_TOKEN
+    description: "MAX Bot API token"
+    prompt: "MAX bot token"
+    url: "https://business.max.ru/self"
+    password: true
+optional_env:
+  - name: MAX_ALLOWED_USERS
+    description: "Comma-separated static MAX user_id DM allowlist (pairing approvals also apply)"
+    prompt: "Allowed MAX user IDs"
+    password: false
+  - name: MAX_ALLOW_ALL_USERS
+    description: "Allow every MAX user (unsafe development override)"
+    prompt: "Allow all MAX users? (true/false)"
+    password: false
+  - name: MAX_POLLING_DEV
+    description: "Enable development-only long polling (default false)"
+    prompt: "Enable development polling? (true/false)"
+    password: false
+  - name: MAX_POLL_TIMEOUT
+    description: "Long-poll timeout in seconds (default 30)"
+    prompt: "Polling timeout"
+    password: false
+  - name: MAX_CA_BUNDLE
+    description: "Profile-scoped CA bundle required for verified MAX API TLS"
+    prompt: "Path to MAX CA bundle"
+    password: false
+  - name: MAX_HOME_CHANNEL
+    description: "Default MAX user or allowlisted group destination for cron delivery"
+    prompt: "Home MAX user or chat ID"
+    password: false
+  - name: MAX_WEBHOOK_SECRET
+    description: "Shared secret checked against the X-Max-Bot-Api-Secret request header when webhook transport is enabled"
+    prompt: "MAX webhook secret"
+    password: true
+
+# Recommended config.yaml platform extra (safe group defaults):
+# platforms:
+#   max:
+#     allowed_users: ["<max-user-id>"]
+#     groups:
+#       enabled: true
+#       allowed_chats: ["<explicit-max-chat-id>"]
+#       require_mention: true
+#       exclusive_bot_mentions: true
+#       mention_patterns: ["\\bhey bot\\b"]
+#       observe_unmentioned_group_messages: false
+#       allow_admin_from: ["<max-user-id>"]
+#       user_allowed_commands: [help, whoami, status, new, stop, retry, undo]
