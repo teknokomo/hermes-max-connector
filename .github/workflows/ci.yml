@@ -35,6 +35,12 @@ jobs:
           uv sync --locked --group dev --python "${{ matrix.python-version }}"
       - name: Unit and integration tests
         run: .venv/bin/python -m pytest -q
+      - name: Tests from a checkout path with a Python-safe name
+        run: |
+          mkdir -p "$RUNNER_TEMP/hmc"
+          git archive HEAD | tar -x -C "$RUNNER_TEMP/hmc"
+          cd "$RUNNER_TEMP/hmc"
+          "${{ github.workspace }}/.venv/bin/python" -m pytest -q
       - name: Autoreview helper reliability
         run: .venv/bin/python .agents/skills/autoreview/scripts/test-autoreview-reliability.py
       - name: Static checks
