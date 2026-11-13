@@ -11,7 +11,7 @@ ROOT = Path(__file__).resolve().parents[1]
 EN = (ROOT / "README.md").read_text(encoding="utf-8")
 RU = (ROOT / "README-RU.md").read_text(encoding="utf-8")
 EXPECTED_EN = [
-    "# Important! Grave! Important!",
+    "# Important! Grave! Важно!",
     "# Hermes MAX Connector",
     "## Developers",
     "## Overview",
@@ -25,7 +25,7 @@ EXPECTED_EN = [
     "## Security and project files",
 ]
 EXPECTED_RU = [
-    "# Важно! Grave! Important!",
+    "# Important! Grave! Важно!",
     "# Hermes MAX Connector",
     "## Разработчики",
     "## Обзор",
