@@ -1,3 +1,10 @@
+🇬🇧 [English](README.md) | 🇷🇺 **Русский**
+
+[![Версия](https://img.shields.io/github/v/release/teknokomo/hermes-max-connector?label=version&color=blue&sort=semver)](https://github.com/teknokomo/hermes-max-connector/releases/latest)
+[![Лицензия: Омская Открытая Лицензия](https://img.shields.io/badge/license-Omsk%20Open%20License-green)](LICENSE-RU.md)
+
+![Технокомо — 73-й Меридиан](docs/assets/teknokomo-om73-ru.jpg)
+
 # Важно! Grave! Important!
 
 - Пролетарии всех стран, соединяйтесь!
@@ -5,9 +12,6 @@
 - Proletoj el ĉiuj landoj, unuiĝu!
 
 # Hermes MAX Connector
-
-[![Версия](https://img.shields.io/github/v/release/teknokomo/hermes-max-connector)](https://github.com/teknokomo/hermes-max-connector/releases/latest)
-[![Лицензия: Омская Открытая Лицензия](https://img.shields.io/badge/license-Omsk%20Open%20License-green)](LICENSE-RU.md)
 
 **Внимание: версия 0.1.0 — первый публичный выпуск. Перед включением коннектора проверьте настройки безопасности и транспорта.**
 
