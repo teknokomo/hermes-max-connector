@@ -1,3 +1,10 @@
+🇬🇧 **English** | 🇷🇺 [Русский](README-RU.md)
+
+[![Version](https://img.shields.io/github/v/release/teknokomo/hermes-max-connector?label=version&color=blue&sort=semver)](https://github.com/teknokomo/hermes-max-connector/releases/latest)
+[![License: Omsk Open License](https://img.shields.io/badge/license-Omsk%20Open%20License-green)](LICENSE.md)
+
+![Teknokomo — 73rd Meridian](docs/assets/teknokomo-om73-en.jpg)
+
 # Important! Grave! Important!
 
 - Workers of the world, unite!
@@ -5,9 +12,6 @@
 - Пролетарии всех стран, соединяйтесь!
 
 # Hermes MAX Connector
-
-[![Version](https://img.shields.io/github/v/release/teknokomo/hermes-max-connector)](https://github.com/teknokomo/hermes-max-connector/releases/latest)
-[![License: Omsk Open License](https://img.shields.io/badge/license-Omsk%20Open%20License-green)](LICENSE.md)
 
 **Attention: version 0.1.0 is the first public release. Review the security and transport settings before enabling this connector.**
 
