@@ -94,11 +94,17 @@ def main() -> int:
     if en_blocks != ru_blocks:
         failures.append("fenced code blocks differ")
     en_links, ru_links = links(EN), links(RU)
+    # Language switchers and localized README banners intentionally differ.
+    localized_links = {
+        ("LICENSE.md", "LICENSE-RU.md"),
+        ("README-RU.md", "README.md"),
+        ("docs/assets/teknokomo-om73-en.jpg", "docs/assets/teknokomo-om73-ru.jpg"),
+    }
     if len(en_links) != len(ru_links):
         failures.append("link counts differ")
     else:
         for index, (en_link, ru_link) in enumerate(zip(en_links, ru_links, strict=True)):
-            if en_link != ru_link and (en_link, ru_link) != ("LICENSE.md", "LICENSE-RU.md"):
+            if en_link != ru_link and (en_link, ru_link) not in localized_links:
                 failures.append(f"link target differs at position {index + 1}: {en_link} != {ru_link}")
     def normalize_number(value: str) -> str:
         return re.sub(r"[, ]", "", value)
