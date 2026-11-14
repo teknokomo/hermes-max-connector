@@ -9,3 +9,4 @@
 - Enforces the inclusive webhook body limit consistently across supported aiohttp versions, including chunked requests.
 - Declares the actual transport, TLS, environment, and Hermes compatibility requirements in the plugin manifest.
 - Adds a source distribution and a wheel package artifact, bilingual user documentation, security guidance, and offline release checks; installation copies the runtime files into the Hermes profile or uses the Hermes plugin installer.
+- Documents that the MAX chat action endpoint, and therefore the typing indicator, applies to group chats: personal dialogs accept the call but do not display an indicator in MAX clients.

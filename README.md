@@ -89,7 +89,7 @@ The optional document-store integration — the `document-store` component of [h
 
 The optional persistent_state setting stores webhook deduplication and interactive-token state in the profile-local max/reliability.db SQLite database. In-memory deduplication retains up to 4,096 recent webhook identities. Persistent entries expire after 7 days. The webhook body limit is 1 MiB.
 
-MAX messages are limited to 4,000 characters per outgoing message and are chunked automatically. Typing notifications are best-effort. Long polling is intended for development, and MAX API behavior may vary by bot permissions and supported update types.
+MAX messages are limited to 4,000 characters per outgoing message and are chunked automatically. The typing indicator uses the documented chat action endpoint, which MAX describes for group chats: in personal dialogs the API accepts the call but MAX clients do not show a typing indicator, verified on the mobile and desktop clients. Long polling is intended for development, and MAX API behavior may vary by bot permissions and supported update types.
 
 ## Verification
 
